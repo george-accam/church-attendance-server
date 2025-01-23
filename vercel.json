@@ -1,7 +1,6 @@
 
 {
     "version": 2,
-    "name": "your-project-name",
     "builds": [
     {
         "src": "server.js",
