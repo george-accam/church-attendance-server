@@ -1,7 +1,7 @@
 import User from "../models/userModel.js";
 import bcrypt from "bcrypt";
 import { generateToken } from "../middleware/middlewareToken.js";
-import internal from "stream";
+
 
 //the register controllers
 export const registerUser = async (req, res) => {
@@ -30,7 +30,7 @@ export const registerUser = async (req, res) => {
             role = "admin";
         }
 
-        const userData = { fullName: JSON.stringify(fullName), email, phoneNumber, password: hashedPassword, role };
+        const userData = { fullName, email, phoneNumber, password: hashedPassword, role };
         if (!userData) {
             return res.status(404).json({
                 success: false,

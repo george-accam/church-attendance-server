@@ -3,6 +3,7 @@ import dotenv from 'dotenv';
 import cors from 'cors';
 import { DBConfiguration } from './src/DBconfig/BDConfiguration.js';
 import userRouter  from './src/routes/userRoute.js';
+import attendanceRouter from './src/routes/attendanceRoute.js';
 dotenv.config();
 
 const app = express();
@@ -22,6 +23,7 @@ app.use(express.json());
 
 // router middleware
 app.use("/api", userRouter);
+app.use("/api", attendanceRouter);
 
 app.get("/", (req, res) => {
     res.json({
