@@ -7,7 +7,7 @@ import attendanceRouter from './src/routes/attendanceRoute.js';
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT; 
+const PORT = process.env.PORT || 3000; 
 // Database Configuration
 DBConfiguration();
 // this will terminate the server if not listening on port 3002
