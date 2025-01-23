@@ -26,7 +26,12 @@ app.use("/api", userRouter);
 app.use("/api", attendanceRouter);
 
 app.get("/", (req, res) => {
-    res.status(200).send(`Server is running successfully...😊😊! on port ${PORT}`);
+    try {
+        res.status(200).send(`Server is running successfully...😊😊! on port ${PORT}`);
+        
+    } catch (error) {
+        res.status(500).json({ message: `Internal server error: ${error.message}`})
+    }
 });
 
 // app.listen(PORT, ()=>{
