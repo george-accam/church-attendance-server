@@ -26,7 +26,7 @@ app.use("/api", userRouter);
 app.use("/api", attendanceRouter);
 
 app.get("/", (req, res) => {
-    res.json({
+    res.status(200).json({
         success: true,
         message: `Server is running successfully...😊😊! on port ${PORT}`
     });
