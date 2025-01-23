@@ -25,7 +25,7 @@ app.use(express.json());
 app.use("/api", userRouter);
 app.use("/api", attendanceRouter);
 
-app.get("/api", (req, res) => {
+app.get("/", (req, res) => {
     try {
         res.status(200).send(`Server is running successfully...😊😊! on port ${PORT}`);
         
