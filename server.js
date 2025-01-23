@@ -26,7 +26,18 @@ app.use("/api", userRouter);
 app.use("/api", attendanceRouter);
 
 app.get("/", (req, res) => {
-    res.status(200).send(`Server is running successfully...😊😊! on port ${PORT}`);
+    res.status(200).send(`<html>
+            <head>
+                <title>Server Status</title>
+                <style>
+                    body { font-family: Arial, sans-serif; }
+                    h1 { color: green; }
+                </style>
+            </head>
+            <body>
+                <h1>Server is running successfully...😊😊! on port ${PORT}</h1>
+            </body>
+        </html>`);
 });
 
 app.listen(PORT, ()=>{
