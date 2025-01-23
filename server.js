@@ -25,7 +25,7 @@ app.use(express.json());
 app.use("/api", userRouter);
 app.use("/api", attendanceRouter);
 
-app.get("/", (req, res) => {
+app.get("/api", (req, res) => {
     try {
         res.status(200).send(`Server is running successfully...😊😊! on port ${PORT}`);
         
@@ -34,8 +34,8 @@ app.get("/", (req, res) => {
     }
 });
 
-// app.listen(PORT, ()=>{
-//     console.log(`Server is running on port ${PORT}`);
-// });
+app.listen(PORT, ()=>{
+    console.log(`Server is running on port ${PORT}`);
+});
 
 export default app;
