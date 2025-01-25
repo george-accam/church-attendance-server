@@ -19,6 +19,4 @@ router.get("/check-in/:phoneNumber", getAttendeeCheckIn); // get number of atten
 router.put("/update-attendance/:id", updateAttendance); // update attendance by id
 router.delete("/delete-attendance/:id", deleteAttendance); // delete attendance by id
 
-
-
 export default router;
