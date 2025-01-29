@@ -25,9 +25,9 @@ export const registerUser = async (req, res) => {
         const hashedPassword = await bcrypt.hash(password, salt);
 
         // set the user role
-        let role = "usher";
+        let role = "Usher";
         if (email.endsWith("@admin.com")) {
-            role = "admin";
+            role = "Admin";
         }
 
         const userData = { fullName, email, phoneNumber, password: hashedPassword, role };
