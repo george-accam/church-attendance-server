@@ -53,9 +53,9 @@ export const createAttendance = async (req, res) => {
 
 // get the personal attendance of a user
 export const getPersonalAttendance = async (req, res) => {
-    const { id } = req.params;
+    const { userId } = req.params;
     try {
-        const personalAttendance = await PersonalAttendance.findById(id).select("-__v");
+        const personalAttendance = await PersonalAttendance.find({ userId }).select("-__v");
         if(!personalAttendance){
             res.status(404).json({ success: false, message: "user not found"});
         }
