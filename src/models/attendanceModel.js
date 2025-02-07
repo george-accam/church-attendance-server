@@ -49,6 +49,8 @@ const personalAttendanceSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+}, { 
+    timestamps: true
 });
 
 export const PersonalAttendance = mongoose.model("PersonalAttendance", personalAttendanceSchema);
