@@ -1,8 +1,8 @@
-import { Attendance, AttendeesCheck } from "../models/attendanceModel.js";
+import { Attendance, AttendeesCheck, PersonalAttendance } from "../models/attendanceModel.js";
 
 //create attendance
 export const createAttendance = async (req, res) => {
-    const { fullName, phoneNumber } = req.body;
+    const { userId, fullName, phoneNumber } = req.body;
     try {
         //check if attendee already exist
         const attendeeExist = await Attendance.findOne({ phoneNumber });
@@ -25,8 +25,45 @@ export const createAttendance = async (req, res) => {
 
         //create new check in
         const checkIn = new AttendeesCheck({ userId: savedAttendance._id });
-        res.status(201).json({ success: true, message: "member created successfully", attendee: savedAttendance, checkIn: checkIn });
+        // save check in
+        const newCheckIn = await checkIn.save();
 
+        // create personal attendance
+        const personalAttendance = new PersonalAttendance({
+            userId: userId,
+            attendeeId: savedAttendance._id,
+            attendeeName: savedAttendance.fullName,
+            attendeePhoneNumber: savedAttendance.phoneNumber,
+        });
+        // save personal attendance
+        const savedPersonalAttendance = await personalAttendance.save();
+
+        res.status(201).json({ 
+            success: true, 
+            message: "member created successfully", 
+            attendee: savedAttendance, 
+            savedPersonalAttendance : savedPersonalAttendance, 
+            checkIn: newCheckIn 
+        });
+
+    } catch (error) {
+        res.status(500).json({ message: `Internal server error: ${error.message}` });
+    }
+};
+
+// get the personal attendance of a user
+export const getPersonalAttendance = async (req, res) => {
+    const { userId } = req.params;
+    try {
+        const personalAttendance = await PersonalAttendance.find({ userId }).select("-__v");
+        if(!personalAttendance){
+            res.status(404).json({ success: false, message: "user not found"});
+        }
+        res.status(200).json({ 
+            success: true, 
+            message: "Personal Attendance retrieved successfully", 
+            personalAttendance: personalAttendance 
+        });
     } catch (error) {
         res.status(500).json({ message: `Internal server error: ${error.message}` });
     }
@@ -45,10 +82,10 @@ export const checkInAttendee = async (req, res) => {
         // Find the most recent check-in for the user
         const lastCheckIn = await AttendeesCheck.findOne({ userId: attendeeExist._id }).sort({ checkInTime: -1 });
 
-        // Check if 12 hours have passed since the last check-in
-        const twelveHoursAgo = new Date(Date.now() - 2 * 60 * 1000); // 12 hours in milliseconds
+        // Check if 2 minutes have passed since the last check-in
+        const twelveHoursAgo = new Date(Date.now() - 2 * 60 * 1000);
         if (lastCheckIn && lastCheckIn.checkInTime > twelveHoursAgo) {
-            return res.status(400).json({ message: "You can only check in once every 12 hours" });
+            return res.status(400).json({ message: "You can only check in once every 2 minutes" });
         }
 
         //create new check in
