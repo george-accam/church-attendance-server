@@ -1,8 +1,8 @@
-import { Attendance, AttendeesCheck } from "../models/attendanceModel.js";
+import { Attendance, AttendeesCheck, PersonalAttendance } from "../models/attendanceModel.js";
 
 //create attendance
 export const createAttendance = async (req, res) => {
-    const { fullName, phoneNumber } = req.body;
+    const { userId, fullName, phoneNumber } = req.body;
     try {
         //check if attendee already exist
         const attendeeExist = await Attendance.findOne({ phoneNumber });
@@ -28,8 +28,42 @@ export const createAttendance = async (req, res) => {
         // save check in
         const newCheckIn = await checkIn.save();
 
-        res.status(201).json({ success: true, message: "member created successfully", attendee: savedAttendance, checkIn: newCheckIn });
+        // create personal attendance
+        const personalAttendance = new PersonalAttendance({
+            userId: userId,
+            attendeeId: savedAttendance._id,
+            attendeeName: savedAttendance.fullName,
+            attendeePhoneNumber: savedAttendance.phoneNumber,
+        });
+        // save personal attendance
+        const savedPersonalAttendance = await personalAttendance.save();
 
+        res.status(201).json({ 
+            success: true, 
+            message: "member created successfully", 
+            attendee: savedAttendance, 
+            savedPersonalAttendance : savedPersonalAttendance, 
+            checkIn: newCheckIn 
+        });
+
+    } catch (error) {
+        res.status(500).json({ message: `Internal server error: ${error.message}` });
+    }
+};
+
+// get the personal attendance of a user
+export const getPersonalAttendance = async (req, res) => {
+    const { id } = req.params;
+    try {
+        const personalAttendance = await PersonalAttendance.findById(id).select("-__v");
+        if(!personalAttendance){
+            res.status(404).json({ success: false, message: "user not found"});
+        }
+        res.status(200).json({ 
+            success: true, 
+            message: "Personal Attendance retrieved successfully", 
+            personalAttendance: personalAttendance 
+        });
     } catch (error) {
         res.status(500).json({ message: `Internal server error: ${error.message}` });
     }

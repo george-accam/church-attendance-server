@@ -28,3 +28,27 @@ const attendeesSchema = new mongoose.Schema({
 });
 
 export const AttendeesCheck = mongoose.model("AttendeesCheck", attendeesSchema);
+
+// personal attendance schema
+const personalAttendanceSchema = new mongoose.Schema({
+    userId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "userDetails",
+        required: true
+    },
+    attendeeId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Attendance",
+        required: true
+    },
+    attendeeName: {
+        type: String,
+        required: true
+    },
+    attendeePhoneNumber: {
+        type: String,
+        required: true
+    },
+});
+
+export const PersonalAttendance = mongoose.model("PersonalAttendance", personalAttendanceSchema);
