@@ -51,6 +51,57 @@ export const createAttendance = async (req, res) => {
     }
 };
 
+// search for an attendee   
+export const searchAttendee = async (req, res) => {
+    const query = req.query.q || "";
+    try {
+        const attendee = await Attendance.find({ 
+            $or: [ 
+                { phoneNumber: { $regex: query, $options: "i" } }, 
+                { fullName: { $regex: query, $options: "i" } } 
+            ]
+        }).select("-__v");
+        
+        if (!attendee) {
+            return res.status(404).json({ message: "member not found" });
+        }
+        if (query === "") {
+            return res.status(404).json({ message: "No member found" });
+        }
+        res.status(200).json({ success: true, message: "member retrieved successfully", attendee: attendee });
+        
+    } catch (error) {
+        res.status(500).json({ message: `Internal server error: ${error.message}` });
+    }
+};
+
+// search the personal attendance of a user
+export const searchPersonalAttendance = async (req, res) => {
+    const query = req.query.q || "";
+    const { userId } = req.params;
+    try {
+        const personalAttendance = await PersonalAttendance.find({
+            userId,
+            $or: [
+                { attendeePhoneNumber: { $regex: query, $options: "i" } },
+                { attendeeName: { $regex: query, $options: "i" } },
+            ],
+        }).select("-__v");
+        if (!userId) {
+            return res.status(404).json({ message: "user id not found" });
+        };
+        if (!personalAttendance) {
+            return res.status(404).json({ message: "member not found" });
+        }
+        if (query === "") {
+            return res.status(404).json({ message: "No member found" });
+        }
+        res.status(200).json({ success: true, message: "member retrieved successfully", personalAttendance: personalAttendance });
+    } catch (error) {
+        res.status(500).json({ message: `Internal server error: ${error.message}` });
+    }
+};
+
 // get the personal attendance of a user
 export const getPersonalAttendance = async (req, res) => {
     const { userId } = req.params;
