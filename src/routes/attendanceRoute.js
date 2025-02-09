@@ -9,6 +9,7 @@ import {
     deleteAttendance,
     getPersonalAttendance, 
     searchAttendee,
+    searchPersonalAttendance,
 } from "../controllers/attendancecontroller.js";
 
 const router = Router();
@@ -16,6 +17,7 @@ const router = Router();
 router.post("/attendee", createAttendance); // create attendance
 router.post("/check-in", checkInAttendee); // check in attendance
 router.get("/search-attendee", searchAttendee); // search attendee
+router.get("/search-personal-attendance/:userId", searchPersonalAttendance); // search personal attendance
 router.get("/attendees", getAttendance); // get all attendance
 router.get("/personal-attendee/:userId", getPersonalAttendance); // get personal attendance by id
 router.get("/attendee/:id", getAttendeeById); // get attendance by id

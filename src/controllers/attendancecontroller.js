@@ -68,9 +68,6 @@ export const searchAttendee = async (req, res) => {
         if (query === "") {
             return res.status(404).json({ message: "No member found" });
         }
-        if (query !== attendee.phoneNumber || query !== attendee.fullName) {
-            return res.status(404).json({ message: "No member found" });
-        }
         res.status(200).json({ success: true, message: "member retrieved successfully", attendee: attendee });
         
     } catch (error) {
@@ -90,13 +87,13 @@ export const searchPersonalAttendance = async (req, res) => {
                 { attendeeName: { $regex: query, $options: "i" } },
             ],
         }).select("-__v");
+        if (!userId) {
+            return res.status(404).json({ message: "user id not found" });
+        };
         if (!personalAttendance) {
             return res.status(404).json({ message: "member not found" });
         }
         if (query === "") {
-            return res.status(404).json({ message: "No member found" });
-        }
-        if (query !== personalAttendance.attendeePhoneNumber || query !== personalAttendance.attendeeName) {
             return res.status(404).json({ message: "No member found" });
         }
         res.status(200).json({ success: true, message: "member retrieved successfully", personalAttendance: personalAttendance });
