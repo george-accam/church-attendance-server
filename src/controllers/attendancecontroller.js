@@ -78,6 +78,33 @@ export const searchAttendee = async (req, res) => {
     }
 };
 
+// search the personal attendance of a user
+export const searchPersonalAttendance = async (req, res) => {
+    const query = req.query.q || "";
+    const { userId } = req.params;
+    try {
+        const personalAttendance = await PersonalAttendance.find({
+            userId,
+            $or: [
+                { attendeePhoneNumber: { $regex: query, $options: "i" } },
+                { attendeeName: { $regex: query, $options: "i" } },
+            ],
+        }).select("-__v");
+        if (!personalAttendance) {
+            return res.status(404).json({ message: "member not found" });
+        }
+        if (query === "") {
+            return res.status(404).json({ message: "No member found" });
+        }
+        if (query !== personalAttendance.attendeePhoneNumber || query !== personalAttendance.attendeeName) {
+            return res.status(404).json({ message: "No member found" });
+        }
+        res.status(200).json({ success: true, message: "member retrieved successfully", personalAttendance: personalAttendance });
+    } catch (error) {
+        res.status(500).json({ message: `Internal server error: ${error.message}` });
+    }
+};
+
 // get the personal attendance of a user
 export const getPersonalAttendance = async (req, res) => {
     const { userId } = req.params;
