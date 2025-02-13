@@ -1,6 +1,6 @@
 import { Attendance, AttendeesCheck, PersonalAttendance } from "../models/attendanceModel.js";
 
-//create attendance
+//register attendance
 export const createAttendance = async (req, res) => {
     const { userId, fullName, phoneNumber } = req.body;
     try {
@@ -40,7 +40,7 @@ export const createAttendance = async (req, res) => {
 
         res.status(201).json({ 
             success: true, 
-            message: "member created successfully", 
+            message: "member registered and checked in successfully", 
             attendee: savedAttendance, 
             savedPersonalAttendance : savedPersonalAttendance, 
             checkIn: newCheckIn 
