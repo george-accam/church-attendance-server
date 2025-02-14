@@ -2,7 +2,7 @@ import { Attendance, AttendeesCheck, PersonalAttendance } from "../models/attend
 
 //register attendance
 export const createAttendance = async (req, res) => {
-    const { userId, fullName, phoneNumber } = req.body;
+    const { userId, userFullName, fullName, phoneNumber } = req.body;
     try {
         //check if attendee already exist
         const attendeeExist = await Attendance.findOne({ phoneNumber });
@@ -11,7 +11,12 @@ export const createAttendance = async (req, res) => {
         }
 
         //create new attendance
-        const newAttendance = new Attendance({fullName, phoneNumber});
+        const newAttendance = new Attendance({ 
+            userId, 
+            userFullName, 
+            fullName, 
+            phoneNumber 
+        });
         if (!newAttendance) {
             return res.status(404).json({ message: "All fields are required" });
         }
@@ -24,7 +29,11 @@ export const createAttendance = async (req, res) => {
         const savedAttendance = await newAttendance.save();
 
         //create new check in
-        const checkIn = new AttendeesCheck({ userId: savedAttendance._id });
+        const checkIn = new AttendeesCheck({ 
+            userId: savedAttendance._id,
+            attendeeFullName: savedAttendance.fullName,
+            attendeePhoneNumber: savedAttendance.phoneNumber 
+        });
         // save check in
         const newCheckIn = await checkIn.save();
 
