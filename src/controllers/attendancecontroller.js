@@ -151,7 +151,7 @@ export const checkInAttendee = async (req, res) => {
         //create new check in
         const newCheckIn = new AttendeesCheck({ 
             userId: attendeeExist._id,
-            attendeeName: attendeeExist.fullName,
+            attendeeFullName: attendeeExist.fullName,
             attendeePhoneNumber: attendeeExist.phoneNumber
         });
         if (!newCheckIn) {

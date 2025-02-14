@@ -1,4 +1,5 @@
 import User from "../models/userModel.js";
+import { Attendance } from "../models/attendanceModel.js";
 import bcrypt from "bcryptjs";
 import { generateToken } from "../middleware/middlewareToken.js";
 
@@ -39,10 +40,24 @@ export const registerUser = async (req, res) => {
         }
         const user = new User(userData);
         const savedUSer = await user.save();
+
+        // added to the attendance
+        let attendance = '';
+        if(role === "Usher"){
+            attendance = new Attendance({ 
+                userId: user._id, 
+                userFullName: user.fullName, 
+                fullName: user.fullName, 
+                phoneNumber: user.phoneNumber 
+            });
+        }
+        const savedAttendance = await attendance.save();
+
         res.status(201).json({
             success: true,
             message: "User registered successfully",
-            user: savedUSer
+            user: savedUSer,
+            attendance: savedAttendance
         });
         
     } catch (error) {
