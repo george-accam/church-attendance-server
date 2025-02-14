@@ -21,6 +21,8 @@ const attendeesSchema = new mongoose.Schema({
         ref: "Attendance",
         required: true
     },
+    attendeeName: String,
+    attendeePhoneNumber: String,
     checkInTime: {
         type: Date,
         default: Date.now

@@ -140,7 +140,11 @@ export const checkInAttendee = async (req, res) => {
         }
 
         //create new check in
-        const newCheckIn = new AttendeesCheck({ userId: attendeeExist._id });
+        const newCheckIn = new AttendeesCheck({ 
+            userId: attendeeExist._id,
+            attendeeName: attendeeExist.fullName,
+            attendeePhoneNumber: attendeeExist.phoneNumber
+        });
         if (!newCheckIn) {
             return res.status(404).json({ message: "All fields are required" });
         }
