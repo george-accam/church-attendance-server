@@ -42,15 +42,12 @@ export const registerUser = async (req, res) => {
         const savedUSer = await user.save();
 
         // added to the attendance
-        let attendance = '';
-        if(role === "Usher"){
-            attendance = new Attendance({ 
-                userId: user._id, 
-                userFullName: user.fullName, 
-                fullName: user.fullName, 
-                phoneNumber: user.phoneNumber 
-            });
-        }
+        const attendance = new Attendance({ 
+             userId: user._id, 
+             userFullName: user.fullName, 
+             fullName: user.fullName, 
+             phoneNumber: user.phoneNumber 
+         });
         const savedAttendance = await attendance.save();
 
         res.status(201).json({
