@@ -129,6 +129,47 @@ export const getPersonalAttendance = async (req, res) => {
     }
 };
 
+// update the personal attendance of a user
+export const updatePersonalAttendance = async (req, res) => {
+    const { id } = req.params;
+    const { userId, attendeeName, attendeePhoneNumber } = req.body;
+    try {
+        const personalAttendance = await PersonalAttendance.findByIdAndUpdate( id, { userId, attendeeName, attendeePhoneNumber }, { new: true } );
+        if (!personalAttendance) {
+        return res.status(404).json({ message: "member not found" });
+        }
+        
+        if (personalAttendance.attendeePhoneNumber.length !== 10) {
+            return res.status(400).json({ message: "Phone number must be 10 digits" });
+        }
+        
+        res.status(200).json({ 
+            success: true, 
+            message: "member updated successfully",
+            personalAttendance: personalAttendance
+        });
+    } catch (error) {
+        res.status(500).json({ message: `Internal server error: ${error.message}` });
+    }
+}
+
+// delete personal attendance by id
+export const deletePersonalAttendance = async (req, res) =>{
+    const { id } = req.params;
+    try {
+        const personalAttendance = await PersonalAttendance.findByIdAndDelete(id);
+        if(!personalAttendance){
+            res.status(404).json({ success: false, message: "member not found" });
+        }
+        res.status(200).json({
+                success: true,
+                message: "member deleted successfully"
+            });
+    } catch (error) {
+        res.status(500).json({ message: `Internal server error: ${error.message}` });
+    }
+}
+
 //check in attendee
 export const checkInAttendee = async (req, res) => {
     const { phoneNumber } = req.body;
