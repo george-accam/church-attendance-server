@@ -10,6 +10,8 @@ import {
     getPersonalAttendance, 
     searchAttendee,
     searchPersonalAttendance,
+    updatePersonalAttendance,
+    deletePersonalAttendance,
 } from "../controllers/attendancecontroller.js";
 
 const router = Router();
@@ -20,6 +22,8 @@ router.get("/search-attendee", searchAttendee); // search attendee
 router.get("/search-personal-attendance/:userId", searchPersonalAttendance); // search personal attendance
 router.get("/attendees", getAttendance); // get all attendance
 router.get("/personal-attendee/:userId", getPersonalAttendance); // get personal attendance by id
+router.put("/update-personal-attendee/:id", updatePersonalAttendance); // update personal attendance
+router.delete("/delete-personal-attendee/:id", deletePersonalAttendance); // delete personal attendance
 router.get("/attendee/:id", getAttendeeById); // get attendance by id
 router.get("/check-in/:phoneNumber", getAttendeeCheckIn); // get number of attendance by phone number
 router.put("/update-attendance/:id", updateAttendance); // update attendance by id
