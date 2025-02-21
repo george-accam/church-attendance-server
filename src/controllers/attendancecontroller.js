@@ -211,7 +211,7 @@ export const checkInAttendee = async (req, res) => {
 //get all attendance
 export const getAttendance = async (req, res) => {
     try {
-        const attendance = await Attendance.find().select("-__v");
+        const attendance = await Attendance.find().select("-__v").sort({ createdAt: -1 });
         res.status(200).json({ success: true, message: "Attendance retrieved successfully", attendance: attendance });
 
     } catch (error) {
