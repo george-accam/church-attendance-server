@@ -43,11 +43,11 @@ export const registerUser = async (req, res) => {
 
         // added to the attendance
         const attendance = new Attendance({ 
-             userId: user._id, 
-             userFullName: user.fullName, 
-             fullName: user.fullName, 
-             phoneNumber: user.phoneNumber 
-         });
+                userId: user._id, 
+                userFullName: user.fullName, 
+                fullName: user.fullName, 
+                phoneNumber: user.phoneNumber 
+            });
         const savedAttendance = await attendance.save();
 
         res.status(201).json({
@@ -157,3 +157,23 @@ export const deleteUser = async(req, res) =>{
         res.status(500).json({ success: false, message: `Internal server error: ${error.message}` });
     }
 };
+
+// search user controller
+export const searchUser = async(req, res)=>{
+    const query = req.query.q || "";
+
+    try {
+        const searchUser = await User.find({ $or: [{ fullName: { $regex: query, $options: "i" } }, { phoneNumber: { $regex: query, $options: "i" } }] });
+        if(!searchUser){
+            res.status(404).json({ success: false, message: "user not found" });
+        }
+        if (query === "") {
+            return res.status(404).json({ message: "No member found" });
+        }
+        res.status(200).json({ success: true, message: "user searched successfully", allUsers: searchUser });
+            
+    } 
+    catch (error) {
+        res.status(500).json({ success: false, message: `Internal server error: ${error.message}` });
+    }
+}
