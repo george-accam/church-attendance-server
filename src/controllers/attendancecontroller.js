@@ -234,6 +234,22 @@ export const getAttendeeById = async (req, res) => {
     }
 };
 
+// get all attendees check ins
+export const getAllAttendeesCheckIns = async (req, res) => {
+    try {
+        const allCheckIns = await AttendeesCheck.find().select("-__v").sort({ checkInTime: -1 });
+
+        if(!allCheckIns){
+            res.status(404).json({ success: false, message: "members not found"});
+        }
+
+        res.status(200).json({ success: true, message: "members check ins retrieved successfully", checkIns: allCheckIns });
+    } 
+    catch (error) {
+        res.status(500).json({ success: false, message: `Internal server error ${error.message}`});
+    }
+};
+
 //get number of attendance by phone number
 export const getAttendeeCheckIn = async (req, res) => {
     const { phoneNumber } = req.params;
