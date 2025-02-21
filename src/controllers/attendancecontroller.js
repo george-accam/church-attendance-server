@@ -223,7 +223,7 @@ export const getAttendance = async (req, res) => {
 export const getAttendeeById = async (req, res) => {
     const { id } = req.params;
     try {
-        const attendee = await Attendance.findById(id).select("-__v");
+        const attendee = await Attendance.findById(id).select("-__v").sort({ createdAt: -1 });
         if (!attendee) {
             return res.status(404).json({ message: "member not found" });
         }

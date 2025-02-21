@@ -94,7 +94,7 @@ export const userLogin = async(req, res)=>{
 //get all users controller
 export const getAllUsers = async(req, res) =>{
     try {
-        const getUsers = await User.find().select("-__v -password");
+        const getUsers = await User.find().select("-__v -password").sort({ createdAt: -1 });
 
         //if the users all not found
         if(!getUsers){
