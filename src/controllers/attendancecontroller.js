@@ -237,13 +237,22 @@ export const getAttendeeById = async (req, res) => {
 // get all attendees check ins
 export const getAllAttendeesCheckIns = async (req, res) => {
     try {
-        const allCheckIns = await AttendeesCheck.find().select("-__v").sort({ checkInTime: -1 });
+        const allCheckIns = await AttendeesCheck.find({}).select("-__v").sort({ checkInTime: -1 });
 
         if(!allCheckIns){
             res.status(404).json({ success: false, message: "members not found"});
         }
+        // Organize data by date
+        const dataByDate = allCheckIns.reduce((acc, item) => {
+        const dateKey = item.checkInTime.toISOString().split('T')[0]; // Format date as YYYY-MM-DD
+        if (!acc[dateKey]) {
+        acc[dateKey] = [];
+        }
+        acc[dateKey].push(item);
+        return acc;
+        }, {});
 
-        res.status(200).json({ success: true, message: "members check ins retrieved successfully", checkIns: allCheckIns });
+        res.status(200).json({ success: true, message: "members check ins retrieved successfully", checkIns: dataByDate });
     } 
     catch (error) {
         res.status(500).json({ success: false, message: `Internal server error ${error.message}`});
