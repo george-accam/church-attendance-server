@@ -42,8 +42,8 @@ const attendeesSchema = new mongoose.Schema({
         required: true
     },
     checkInTime: {
-        type: Date,
-        default: Date.now
+        type: String,
+        default: ()=> new Date().toISOString()
     },
 });
 export const AttendeesCheck = mongoose.model("AttendeesCheck", attendeesSchema);

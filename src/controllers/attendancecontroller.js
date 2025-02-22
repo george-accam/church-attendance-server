@@ -252,12 +252,58 @@ export const getAllAttendeesCheckIns = async (req, res) => {
         return acc;
         }, {});
 
-        res.status(200).json({ success: true, message: "members check ins retrieved successfully", checkIns: dataByDate });
+        res.status(200).json({ success: true, message: "members check ins retrieved successfully", totalCheckIns: allCheckIns, checkIns: dataByDate });
     } 
     catch (error) {
         res.status(500).json({ success: false, message: `Internal server error ${error.message}`});
     }
 };
+
+// search for checked in attendee
+export const searchCheckedInAttendee = async (req, res) => {
+    const query = req.query.q;
+    try {
+        const searchedAttendee = await AttendeesCheck.find({ 
+            $or: [
+                {attendeeFullName: {$regex: query, $options: "i"}},
+                {attendeePhoneNumber: {$regex: query, $options: "i"}},
+                {checkInTime: {$regex: query, $options: "i"}}
+            ] 
+        }).select("-__v").sort({ checkInTime: -1 }).maxTimeMS(15000); ;
+
+        // Organize data by date
+        const dataByDate = searchedAttendee.reduce((acc, item) => {
+            const dateKey = new Date(item.checkInTime).toISOString().split('T')[0];
+            if (!acc[dateKey]) {
+            acc[dateKey] = [];
+            }
+            acc[dateKey].push(item);
+            return acc;
+            }, {});
+        
+        if (!searchedAttendee) {
+            res.status(404).json({ success: false, message: "member not found" });
+        }
+        // If no attendee is found
+        if (searchedAttendee.length === 0) {
+            return res.status(404).json({
+                success: false,
+                message: "No members found matching your search"
+            });
+        }
+        res.status(200).json({ 
+            success: true, 
+            message: "member searched successfully", 
+            attendee: searchedAttendee,
+            totalCheckIns: searchedAttendee.length,
+            checkIns: dataByDate
+        });
+    } 
+    catch (error) {
+        res.status(500).json({ success: false, message: `Internal server error ${error.message}` });
+    }
+};
+
 
 //get number of attendance by phone number
 export const getAttendeeCheckIn = async (req, res) => {
