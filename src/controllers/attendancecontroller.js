@@ -244,7 +244,7 @@ export const getAllAttendeesCheckIns = async (req, res) => {
         }
         // Organize data by date
         const dataByDate = allCheckIns.reduce((acc, item) => {
-        const dateKey = item.checkInTime.toISOString().split('T')[0]; // Format date as YYYY-MM-DD
+        const dateKey = new Date(item.checkInTime).toISOString().split('T')[0]; // Format date as YYYY-MM-DD
         if (!acc[dateKey]) {
         acc[dateKey] = [];
         }
