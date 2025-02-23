@@ -261,13 +261,12 @@ export const getAllAttendeesCheckIns = async (req, res) => {
 
 // search for checked in attendee
 export const searchCheckedInAttendee = async (req, res) => {
-    const query = req.query.q;
+    const query = req.query.q || "";
     try {
         const searchedAttendee = await AttendeesCheck.find({ 
             $or: [
                 {attendeeFullName: {$regex: query, $options: "i"}},
-                {attendeePhoneNumber: {$regex: query, $options: "i"}},
-                {checkInTime: {$regex: query, $options: "i"}}
+                {attendeePhoneNumber: {$regex: query, $options: "i"}}
             ] 
         }).select("-__v").sort({ checkInTime: -1 }).maxTimeMS(15000); ;
 
