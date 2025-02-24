@@ -266,7 +266,8 @@ export const searchCheckedInAttendee = async (req, res) => {
         const searchedAttendee = await AttendeesCheck.find({ 
             $or: [
                 {attendeeFullName: {$regex: query, $options: "i"}},
-                {attendeePhoneNumber: {$regex: query, $options: "i"}}
+                {attendeePhoneNumber: {$regex: query, $options: "i"}},
+                {checkInTime: {$regex: query, $options: "i"}}
             ] 
         }).select("-__v").sort({ checkInTime: -1 }).maxTimeMS(15000); ;
 
