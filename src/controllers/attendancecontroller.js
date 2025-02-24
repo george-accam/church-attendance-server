@@ -283,13 +283,6 @@ export const searchCheckedInAttendee = async (req, res) => {
         if (!searchedAttendee) {
             res.status(404).json({ success: false, message: "member not found" });
         }
-        // If no attendee is found
-        if (searchedAttendee.length === 0) {
-            return res.status(404).json({
-                success: false,
-                message: "No members found matching your search"
-            });
-        }
         res.status(200).json({ 
             success: true, 
             message: "member searched successfully", 
