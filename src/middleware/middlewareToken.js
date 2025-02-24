@@ -25,8 +25,12 @@ export const verifyToken = (req, res, next) =>{
     //split the token from the bearer
     const [bearer, token]  = authHeader.split(' ');
     
+    //check if the bearer is not in the right format
+    if (bearer.toLowerCase() !== 'bearer') {
+        return res.status(401).json({ success: false, message: "Invalid token format" });
+    }
     //check if the token is not in the right format
-    if (bearer !== 'Bearer' || !token) {
+    if (!token) {
         return res.status(401).json({ success: false, message: "Invalid token format" });
     }
 
