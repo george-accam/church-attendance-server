@@ -184,9 +184,9 @@ export const checkInAttendee = async (req, res) => {
         const lastCheckIn = await AttendeesCheck.findOne({ userId: attendeeExist._id }).sort({ checkInTime: -1 });
 
         // Check if 2 minutes have passed since the last check-in
-        const twelveHoursAgo = new Date(Date.now() - 2 * 60 * 1000);
+        const twelveHoursAgo = new Date(Date.now() - 2 * 60 * 60 * 1000);
         if (lastCheckIn && lastCheckIn.checkInTime > twelveHoursAgo) {
-            return res.status(400).json({ message: "You can only check in once every 2 minutes" });
+            return res.status(400).json({ message: "You can only check in once every 2 hours" });
         }
 
         //create new check in
