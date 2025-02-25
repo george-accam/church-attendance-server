@@ -115,7 +115,7 @@ export const searchPersonalAttendance = async (req, res) => {
 export const getPersonalAttendance = async (req, res) => {
     const { userId } = req.params;
     try {
-        const personalAttendance = await PersonalAttendance.find({ userId }).select("-__v");
+        const personalAttendance = await PersonalAttendance.find({ userId }).select("-__v").sort({ createdAt: -1 });
         if(!personalAttendance){
             res.status(404).json({ success: false, message: "user not found"});
         }
@@ -219,7 +219,7 @@ export const getAttendance = async (req, res) => {
     }
 }
 
-//get attendee by id
+//get attendee by id  
 export const getAttendeeById = async (req, res) => {
     const { id } = req.params;
     try {
