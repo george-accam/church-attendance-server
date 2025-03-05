@@ -2,7 +2,7 @@ import { rateLimit } from "express-rate-limit";
 
 export const limiter = rateLimit({
     windowMs: 10 * 60* 1000,
-    limit: 2, 
+    limit: 5, 
     standardHeaders: true,
     legacyHeaders: false,
     message: "Too many attempt to login, please try again after 10 minutes",
