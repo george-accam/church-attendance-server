@@ -5,8 +5,10 @@ import { registerUser, userLogin, getAllUsers, getUserById, updateUser, deleteUs
 
 const router = Router();
 
+router.use(limiter);
+
 router.post("/register", registerUser); // register user
-router.post("/login", limiter, userLogin); // login user
+router.post("/login", userLogin); // login user
 router.get("/users", getAllUsers); // get all users
 router.get("/search-users", searchUser); // search user
 router.get("/user-id", verifyToken, getUserById); // get user by id
