@@ -1,7 +1,7 @@
 import { RateLimiterMemory } from "rate-limiter-flexible";
 
 const MAX_REQUEST_LIMIT = 2;
-const MAX_REQUEST_WINDOW = 10000;
+const MAX_REQUEST_WINDOW = 10;
 const TOO_MANY_REQUESTS_MESSAGE = 'Too many requests';
 
 const options = {
