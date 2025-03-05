@@ -4,7 +4,6 @@ import { limiter } from "../middleware/Limiter.js";
 import { registerUser, userLogin, getAllUsers, getUserById, updateUser, deleteUser, searchUser } from "../controllers/userController.js";
 
 const router = Router();
-router.use( "/login",limiter);
 
 router.post("/register", registerUser); // register user
 router.post("/login", limiter, userLogin); // login user
