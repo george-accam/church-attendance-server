@@ -79,7 +79,7 @@ export const userLogin = async(req, res)=>{
         //check if the password is valid
         const isValidPassword = await bcrypt.compare(password, userExist.password);
         if (!isValidPassword) {
-            res.status(204).json({ success: false, message: "password is invalid" });
+            res.status(404).json({ success: false, message: "password is invalid" });
         }
 
         //generate token for the user
