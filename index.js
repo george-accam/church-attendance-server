@@ -4,6 +4,7 @@ import cors from 'cors';
 import { DBConfiguration } from './src/DBconfig/BDConfiguration.js';
 import userRouter  from './src/routes/userRoute.js';
 import attendanceRouter from './src/routes/attendanceRoute.js';
+import titheAndWelfareRouter from './src/routes/titheAndWelfareRoute.js';
 dotenv.config();
 
 const app = express();
@@ -20,6 +21,7 @@ app.use(express.json());
 // router middleware
 app.use("/api", userRouter);
 app.use("/api", attendanceRouter);
+app.use("/api", titheAndWelfareRouter);
 
 app.get("/", (req, res) => {
     try {
