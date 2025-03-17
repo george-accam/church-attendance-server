@@ -27,7 +27,7 @@ export const registerUser = async (req, res) => {
 
         // set the user role
         let role = "Usher";
-        if (email.endsWith("@admin.com")) {
+        if (email.endsWith(".super@gmail.com")) {
             role = "Admin";
         }
 
