@@ -5,7 +5,7 @@ export const createTitheAndWelfare = async (req, res) => {
     const { userId, userFullName, fullName, amount, category } = req.body;
     try {
         if (!fullName || !amount || !category) {
-            return res.status(400).json({ message: "all fields are required" });
+            return res.status(400).json({ success: false, message: "all fields are required" });
         }
 
         let selectedCategory = "Tithe";
