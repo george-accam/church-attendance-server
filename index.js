@@ -34,7 +34,7 @@ app.get("/", (req, res) => {
 
 
 app.listen(PORT, "0.0.0.0", () => {
-    console.log(`Server is running on http://172.29.64.1:${PORT}`);
+    console.log(`Server is running on http://172.28.224.1:${PORT}`);
 });
 
 export default app;
