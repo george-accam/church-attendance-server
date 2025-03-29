@@ -3,33 +3,60 @@ import { titheAndWelfare } from "../models/titheAndWelfareModel.js";
 //  Create a new tithe and welfare record
 export const createTitheAndWelfare = async (req, res) => {
     const { userId, userFullName, fullName, amount, category } = req.body;
+    
     try {
+        // Validate required fields
         if (!fullName || !amount || !category) {
-            return res.status(400).json({ success: false, message: "all fields are required" });
+            return res.status(400).json({ 
+                success: false, 
+                message: "All fields are required" 
+            });
         }
 
-        let selectedCategory = "Tithe";
-        if (category === "Welfare") {
-            selectedCategory = "Welfare";
+        // Find the most recent entry of the same category for this user
+        const lastEntry = await titheAndWelfare.findOne({ 
+            userId,
+            category 
+        }).sort({ createdAt: -1 });
+
+        // Check if 12 hours have passed since the last entry of this category
+        if (lastEntry) {
+            const twelveHoursInMs = 12 * 60 * 60 * 1000;
+            const timeSinceLastEntry = Date.now() - new Date(lastEntry.createdAt).getTime();
+            
+            if (timeSinceLastEntry < twelveHoursInMs) {
+                return res.status(400).json({ 
+                    success: false, 
+                    message: `You can only submit ${category} once every 12 hours` 
+                });
+            }
         }
-        // Find the most recent check-in for the user
-        const lastCreated = await titheAndWelfare.findOne({ _id: titheAndWelfare._id }).sort({ createdAt: -1 });
 
-        // Check if 12 hours have passed since the last check-in
-        const twelveHoursAgo = new Date(Date.now() - 12 * 60 * 60 * 1000).toISOString();
-        if (lastCreated && lastCreated.createdAt > twelveHoursAgo) {
-            return res.status(400).json({ message: "you can only input amount once in once" });
-        }
+        // Create new entry
+        const newEntry = new titheAndWelfare({ 
+            userId, 
+            userFullName, 
+            fullName, 
+            amount, 
+            category 
+        });
 
-        const newTitheAndWelfare = new titheAndWelfare({ userId, userFullName, fullName, amount, category: selectedCategory });
+        // Save the new entry
+        const savedEntry = await newEntry.save();
+        
+        res.status(201).json({ 
+            success: true, 
+            message: `${category} recorded successfully`, 
+            data: savedEntry 
+        });
 
-        // save the new tithe and welfare
-        const savedTitheAndWelfare = await newTitheAndWelfare.save();
-        res.status(201).json({ success: true, message: "recorded successfully", savedTitheAndWelfare: savedTitheAndWelfare });
-
-    } 
-    catch (error) {
-        res.status(409).json({ message: error.message });
+    } catch (error) {
+        console.error("Error creating tithe/welfare:", error);
+        res.status(500).json({ 
+            success: false, 
+            message: "Internal server error",
+            error: error.message 
+        });
     }
 }
 
