@@ -27,7 +27,7 @@ export const createTitheAndWelfare = async (req, res) => {
             if (timeSinceLastEntry < twelveHoursInMs) {
                 return res.status(400).json({ 
                     success: false, 
-                    message: `You can only submit ${category} once every 12 hours` 
+                    message: `You can only submit ${category} once` 
                 });
             }
         }
