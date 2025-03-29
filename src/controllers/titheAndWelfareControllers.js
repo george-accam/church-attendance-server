@@ -9,7 +9,7 @@ export const createTitheAndWelfare = async (req, res) => {
         if (!fullName || !amount || !category) {
             return res.status(400).json({ 
                 success: false, 
-                message: "All fields are required" 
+                message: "all fields are required" 
             });
         }
 
@@ -27,7 +27,7 @@ export const createTitheAndWelfare = async (req, res) => {
             if (timeSinceLastEntry < twelveHoursInMs) {
                 return res.status(400).json({ 
                     success: false, 
-                    message: `You can only submit ${category} once` 
+                    message: `you can only submit ${category} once` 
                 });
             }
         }
@@ -54,7 +54,7 @@ export const createTitheAndWelfare = async (req, res) => {
         console.error("Error creating tithe/welfare:", error);
         res.status(500).json({ 
             success: false, 
-            message: "Internal server error",
+            message: `Internal server error: ${error.message}`,
             error: error.message 
         });
     }
