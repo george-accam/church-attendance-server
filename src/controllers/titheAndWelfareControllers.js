@@ -13,11 +13,11 @@ export const createTitheAndWelfare = async (req, res) => {
             selectedCategory = "Welfare";
         }
         // Find the most recent check-in for the user
-        const lastCheckIn = await titheAndWelfare.findOne({ userId: titheAndWelfare._id }).sort({ createdAt: -1 });
+        const lastCreated = await titheAndWelfare.findOne({ _id: titheAndWelfare._id }).sort({ createdAt: -1 });
 
         // Check if 12 hours have passed since the last check-in
         const twelveHoursAgo = new Date(Date.now() - 12 * 60 * 60 * 1000).toISOString();
-        if (lastCheckIn && lastCheckIn.checkInTime > twelveHoursAgo) {
+        if (lastCreated && lastCreated.createdAt > twelveHoursAgo) {
             return res.status(400).json({ message: "you can only input amount once in once" });
         }
 
