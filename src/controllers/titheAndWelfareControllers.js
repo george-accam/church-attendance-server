@@ -51,7 +51,6 @@ export const createTitheAndWelfare = async (req, res) => {
         });
 
     } catch (error) {
-        console.error("Error creating tithe/welfare:", error);
         res.status(500).json({ 
             success: false, 
             message: `Internal server error: ${error.message}`,
@@ -63,12 +62,22 @@ export const createTitheAndWelfare = async (req, res) => {
 //  Get all tithe and welfare records
 export const getTitheAndWelfare = async (req, res) => {
     try {
-        const titheAndWelfareData = await titheAndWelfare.find().sort({ createdAt: -1 });
+        const titheAndWelfareData = await titheAndWelfare.find({}).sort({ createdAt: -1 });
+
+        // Organize data by date
+        const dataByDate = titheAndWelfareData.reduce((acc, item) => {
+        const dateKey = new Date(item.createdAt); // Format date as YYYY-MM-DD
+        if (!acc[dateKey]) {
+        acc[dateKey] = [];
+        }
+        acc[dateKey].push(item);
+        return acc;
+        }, {});
 
         res.status(200).json({ 
             success: true, 
             message: "tithe and welfare data retrieved successfully", 
-            titheAndWelfareData: titheAndWelfareData 
+            titheAndWelfareData: dataByDate
         });
     } 
     catch (error) {
