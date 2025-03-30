@@ -21,7 +21,7 @@ export const createTitheAndWelfare = async (req, res) => {
 
         // Check if 12 hours have passed since the last entry of this category
         if (lastEntry) {
-            const twelveHoursInMs = 12 * 60 * 60 * 1000;
+            const twelveHoursInMs = 6 * 60 * 60 * 1000;
             const timeSinceLastEntry = Date.now() - new Date(lastEntry.createdAt).getTime();
             
             if (timeSinceLastEntry < twelveHoursInMs) {
