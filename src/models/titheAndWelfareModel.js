@@ -24,6 +24,10 @@ const titheAndWelfareSchema = new mongoose.Schema({
         default: 'Tithe',
         required: true,
     },
+    dateCreated:{
+        type: String,
+        default: ()=> new Date().toISOString()
+    },
 },{
     timestamps: true
 });

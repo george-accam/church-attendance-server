@@ -15,7 +15,7 @@ export const createTitheAndWelfare = async (req, res) => {
 
         // Find the most recent entry of the same category for this user
         const lastEntry = await titheAndWelfare.findOne({ 
-            userId,
+            fullName,
             category 
         }).sort({ createdAt: -1 });
 
@@ -66,7 +66,7 @@ export const getTitheAndWelfare = async (req, res) => {
 
         // Organize data by date
         const dataByDate = titheAndWelfareData.reduce((acc, item) => {
-        const dateKey = new Date(item.createdAt); // Format date as YYYY-MM-DD
+        const dateKey = new Date(item.dateCreated).toISOString().split("T")[0]; // Format date as YYYY-MM-DD
         if (!acc[dateKey]) {
         acc[dateKey] = [];
         }
