@@ -59,25 +59,86 @@ export const createTitheAndWelfare = async (req, res) => {
     }
 }
 
-//  Get all tithe and welfare records
+export const searchTitheAndWelfare = async (req, res) => {
+    const query  = req.query.q; 
+    try {
+        const titheAndWelfareData = await titheAndWelfare.find({ 
+                $or: [
+                    {fullName: { $regex: query, $options: "i"}},
+                    {dateCreated: {$regex: query, $options: "i"}}
+                ] 
+            }).sort({ createdAt: -1 });
+
+        // Organize data by date
+        const dataByDate = titheAndWelfareData.reduce((acc, item) => {
+            const dateKey = new Date(item.dateCreated).toISOString().split("T")[0]; // Format date as YYYY-MM-DD
+            if (!acc[dateKey]) {
+            acc[dateKey] = [];
+            }
+            acc[dateKey].push(item);
+            return acc;
+            }, {});
+        
+        if (!dataByDate) {
+            res.status(404).json({ 
+                success: false, 
+                message: "tithe and welfare record not found" 
+            });
+        }
+
+        res.status(200).json({ 
+            success: true, 
+            message: "tithe and welfare record retrieved successfully", 
+            dataByDate: dataByDate 
+        });
+    } catch (error) {
+        res.status(500).json({ success: false, message: `Internal server error: ${error.message}` });
+    }
+};
+
+
+// Get all tithe and welfare records
 export const getTitheAndWelfare = async (req, res) => {
     try {
         const titheAndWelfareData = await titheAndWelfare.find({}).sort({ createdAt: -1 });
 
-        // Organize data by date
-        const dataByDate = titheAndWelfareData.reduce((acc, item) => {
-        const dateKey = new Date(item.dateCreated).toISOString().split("T")[0]; // Format date as YYYY-MM-DD
-        if (!acc[dateKey]) {
-        acc[dateKey] = [];
+        // If no data found
+        if(titheAndWelfareData.length === 0) {
+            return res.status(404).json({ success: false, message: "No dues found" });
         }
-        acc[dateKey].push(item);
-        return acc;
+
+        // Organize data by date and calculate totals
+        let totalOverallAmount = 0;
+        const dataByDate = titheAndWelfareData.reduce((acc, item) => {
+            const dateKey = new Date(item.dateCreated).toISOString().split("T")[0];
+            if (!acc[dateKey]) {
+                acc[dateKey] = [];
+            }
+            acc[dateKey].push(item);
+            
+            // Add to total amount if item.amount exists
+            if (item.amount) {
+                totalOverallAmount += item.amount;
+            }
+            
+            return acc;
         }, {});
+
+        // Calculate total amount by date
+        const totalAmountByDate = {};
+        Object.keys(dataByDate).forEach(date => {
+            totalAmountByDate[date] = dataByDate[date].reduce((sum, item) => {
+                return sum + (item.amount || 0);
+            }, 0);
+        });
 
         res.status(200).json({ 
             success: true, 
             message: "tithe and welfare data retrieved successfully", 
-            titheAndWelfareData: dataByDate
+            titheAndWelfareData: dataByDate,
+            totalAmountByDate: totalAmountByDate,
+            totalAmount: totalOverallAmount,
+            totalRecords: titheAndWelfareData.length
         });
     } 
     catch (error) {
