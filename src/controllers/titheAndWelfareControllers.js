@@ -69,27 +69,66 @@ export const searchTitheAndWelfare = async (req, res) => {
                 ] 
             }).sort({ createdAt: -1 });
 
-        // Organize data by date
+
+        // Organize data by date and calculate totals
+        let totalOverallAmount = 0;
+        let totalTitheAmount = 0;
+        let totalWelfareAmount = 0;
+        
         const dataByDate = titheAndWelfareData.reduce((acc, item) => {
-            const dateKey = new Date(item.dateCreated).toISOString().split("T")[0]; // Format date as YYYY-MM-DD
+            const dateKey = new Date(item.dateCreated).toISOString().split("T")[0];
             if (!acc[dateKey]) {
-            acc[dateKey] = [];
+                acc[dateKey] = [];
             }
             acc[dateKey].push(item);
+            
+            // Add to totals
+            if (item.amount) {
+                totalOverallAmount += item.amount;
+                
+                // Add to specific category total
+                if (item.category === 'Tithe') {
+                    totalTitheAmount += item.amount;
+                } else if (item.category === 'Welfare') {
+                    totalWelfareAmount += item.amount;
+                }
+            }
+            
             return acc;
-            }, {});
+        }, {});
+
+        // Calculate total amount by date and by category
+        const totalAmountByDate = {};
+        const titheAmountByDate = {};
+        const welfareAmountByDate = {};
         
-        if (!dataByDate) {
-            res.status(404).json({ 
-                success: false, 
-                message: "tithe and welfare record not found" 
-            });
-        }
+        Object.keys(dataByDate).forEach(date => {
+            // Total for all records on this date
+            totalAmountByDate[date] = dataByDate[date].reduce((sum, item) => {
+                return sum + (item.amount || 0);
+            }, 0);
+            
+            // Tithe-only total for this date
+            titheAmountByDate[date] = dataByDate[date]
+                .filter(item => item.category === 'Tithe')
+                .reduce((sum, item) => sum + (item.amount || 0), 0);
+            
+            // Welfare-only total for this date
+            welfareAmountByDate[date] = dataByDate[date]
+                .filter(item => item.category === 'Welfare')
+                .reduce((sum, item) => sum + (item.amount || 0), 0);
+        });
 
         res.status(200).json({ 
             success: true, 
-            message: "tithe and welfare record retrieved successfully", 
-            dataByDate: dataByDate 
+            message: "tithe and welfare data retrieved successfully", 
+            titheAndWelfareData: dataByDate,
+            totalAmountByDate: totalAmountByDate,
+            titheAmountByDate: titheAmountByDate,
+            welfareAmountByDate: welfareAmountByDate,
+            totalAmount: totalOverallAmount,
+            totalTitheAmount: totalTitheAmount,
+            totalWelfareAmount: totalWelfareAmount,
         });
     } catch (error) {
         res.status(500).json({ success: false, message: `Internal server error: ${error.message}` });
