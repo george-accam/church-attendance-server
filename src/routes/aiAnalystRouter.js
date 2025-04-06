@@ -3,6 +3,6 @@ import { Router } from "express";
 
 const router = Router();
 
-router.get("/ai-analyst", aiAnalyst); // AI Analyst route
+router.post("/ai-analyst", aiAnalyst); // AI Analyst route
 
 export default router;
