@@ -11,7 +11,14 @@ export const aiAnalyst = async (req, res) => {
             model: "gemini-2.0-flash",
             contents: prompt,
         });
-        res.status(200).json({ response: response.text });
+        if (!response || !response.text) {
+            return res.status(400).json({ message: "No response from AI Analyst" });
+        }
+        res.status(200).json({ 
+            success: true,
+            message: "AI Analyst response",
+            information: response.text 
+        });
     } catch (error) {
         res.status(500).json({ message: `Internal server error: ${error.message}` });
     }
