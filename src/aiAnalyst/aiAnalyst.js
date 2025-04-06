@@ -20,6 +20,9 @@ export const aiAnalyst = async (req, res) => {
             information: response.text 
         });
     } catch (error) {
-        res.status(500).json({ message: `Internal server error: ${error.message}` });
+        res.status(500).json({
+            success: false, 
+            message: `Internal server error: ${error.message}` 
+        });
     }
 }
