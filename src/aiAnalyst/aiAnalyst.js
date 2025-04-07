@@ -11,7 +11,7 @@ export const aiAnalyst = async (req, res) => {
         const { prompt } = req.body;
         const response = await ai.models.generateContent({
             model: "gemini-2.0-flash",
-            contents: `explain following text in not more than 3-8 passage: ${prompt}`,
+            contents: `respond to every prompt in not more than 3-8 passage: ${prompt}`,
         });
         if (!response || !response.text) {
             return res.status(400).json({ message: "No response from AI Analyst" });
