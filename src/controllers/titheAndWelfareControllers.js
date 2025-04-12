@@ -136,7 +136,7 @@ export const searchTitheAndWelfare = async (req, res) => {
 };
 
 
-// Get all tithe and welfare records with separate totals
+// Get all tithe and welfare records with separate totals including monthly totals
 export const getTitheAndWelfare = async (req, res) => {
     try {
         const titheAndWelfareData = await titheAndWelfare.find({}).sort({ createdAt: -1 });
@@ -178,22 +178,54 @@ export const getTitheAndWelfare = async (req, res) => {
         const titheAmountByDate = {};
         const welfareAmountByDate = {};
         
+        // New objects for monthly totals
+        const totalAmountByMonth = {};
+        const titheAmountByMonth = {};
+        const welfareAmountByMonth = {};
+        
         Object.keys(dataByDate).forEach(date => {
+            const dateObj = new Date(date);
+            const monthYearKey = `${dateObj.getFullYear()}-${(dateObj.getMonth() + 1).toString().padStart(2, '0')}`;
+            
+            // Initialize month totals if not exists
+            if (!totalAmountByMonth[monthYearKey]) {
+                totalAmountByMonth[monthYearKey] = 0;
+                titheAmountByMonth[monthYearKey] = 0;
+                welfareAmountByMonth[monthYearKey] = 0;
+            }
+            
             // Total for all records on this date
-            totalAmountByDate[date] = dataByDate[date].reduce((sum, item) => {
+            const dateTotal = dataByDate[date].reduce((sum, item) => {
                 return sum + (item.amount || 0);
             }, 0);
+            totalAmountByDate[date] = dateTotal;
+            totalAmountByMonth[monthYearKey] += dateTotal;
             
             // Tithe-only total for this date
-            titheAmountByDate[date] = dataByDate[date]
+            const dateTitheTotal = dataByDate[date]
                 .filter(item => item.category === 'Tithe')
                 .reduce((sum, item) => sum + (item.amount || 0), 0);
+            titheAmountByDate[date] = dateTitheTotal;
+            titheAmountByMonth[monthYearKey] += dateTitheTotal;
             
             // Welfare-only total for this date
-            welfareAmountByDate[date] = dataByDate[date]
+            const dateWelfareTotal = dataByDate[date]
                 .filter(item => item.category === 'Welfare')
                 .reduce((sum, item) => sum + (item.amount || 0), 0);
+            welfareAmountByDate[date] = dateWelfareTotal;
+            welfareAmountByMonth[monthYearKey] += dateWelfareTotal;
         });
+
+        // Convert monthly totals to an array of objects for easier consumption
+        const monthlyTotals = Object.keys(totalAmountByMonth).map(monthYear => {
+            return {
+                monthYear,
+                month: new Date(`${monthYear}-01`).toLocaleString('default', { month: 'long', year: 'numeric' }),
+                totalAmount: totalAmountByMonth[monthYear],
+                titheAmount: titheAmountByMonth[monthYear],
+                welfareAmount: welfareAmountByMonth[monthYear]
+            };
+        }).sort((a, b) => new Date(`${a.monthYear}-01`) - new Date(`${b.monthYear}-01`));
 
         res.status(200).json({ 
             success: true, 
@@ -205,6 +237,10 @@ export const getTitheAndWelfare = async (req, res) => {
             totalAmount: totalOverallAmount,
             totalTitheAmount: totalTitheAmount,
             totalWelfareAmount: totalWelfareAmount,
+            monthlyTotals: monthlyTotals,
+            totalAmountByMonth: totalAmountByMonth,
+            titheAmountByMonth: titheAmountByMonth,
+            welfareAmountByMonth: welfareAmountByMonth
         });
     } 
     catch (error) {
