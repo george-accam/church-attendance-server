@@ -234,31 +234,77 @@ export const getAttendeeById = async (req, res) => {
     }
 };
 
-// get all attendees check ins
+// Get all attendees check-ins with daily and monthly breakdowns
 export const getAllAttendeesCheckIns = async (req, res) => {
     try {
         const allCheckIns = await AttendeesCheck.find({}).select("-__v").sort({ checkInTime: -1 });
 
-        if(!allCheckIns){
-            res.status(404).json({ success: false, message: "members not found"});
+        if(!allCheckIns || allCheckIns.length === 0) {
+            return res.status(404).json({ success: false, message: "No check-ins found" });
         }
-        // Organize data by date
-        const dataByDate = allCheckIns.reduce((acc, item) => {
-        const dateKey = new Date(item.checkInTime).toISOString().split('T')[0]; // Format date as YYYY-MM-DD
-        if (!acc[dateKey]) {
-        acc[dateKey] = [];
-        }
-        acc[dateKey].push(item);
-        return acc;
-        }, {});
 
-        res.status(200).json({ success: true, message: "members check ins retrieved successfully", totalCheckIns: allCheckIns, checkIns: dataByDate });
+        // Organize data by date and calculate monthly totals
+        const dataByDate = {};
+        const checkInsByMonth = {};
+        const memberCountByMonth = new Set();
+        const uniqueMembersByMonth = {};
+
+        allCheckIns.forEach((item) => {
+            const checkInDate = new Date(item.checkInTime);
+            const dateKey = checkInDate.toISOString().split('T')[0]; // YYYY-MM-DD
+            const monthYearKey = `${checkInDate.getFullYear()}-${(checkInDate.getMonth() + 1).toString().padStart(2, '0')}`; // YYYY-MM
+            
+            // Organize by date
+            if (!dataByDate[dateKey]) {
+                dataByDate[dateKey] = [];
+            }
+            dataByDate[dateKey].push(item);
+
+            // Count total check-ins by month
+            if (!checkInsByMonth[monthYearKey]) {
+                checkInsByMonth[monthYearKey] = 0;
+            }
+            checkInsByMonth[monthYearKey]++;
+
+            // Track unique members by month
+            if (!uniqueMembersByMonth[monthYearKey]) {
+                uniqueMembersByMonth[monthYearKey] = new Set();
+            }
+            if (item.memberId) {
+                uniqueMembersByMonth[monthYearKey].add(item.memberId.toString());
+            }
+        });
+
+        // Convert monthly data to a more usable format
+        const monthlyStats = Object.keys(checkInsByMonth).map(monthKey => {
+            return {
+                month: monthKey,
+                formattedMonth: new Date(`${monthKey}-01`).toLocaleString('default', { month: 'long', year: 'numeric' }),
+                totalCheckIns: checkInsByMonth[monthKey],
+                uniqueMembers: uniqueMembersByMonth[monthKey]?.size || 0
+            };
+        }).sort((a, b) => new Date(`${a.month}-01`) - new Date(`${b.month}-01`));
+
+        res.status(200).json({ 
+            success: true, 
+            message: "Check-ins retrieved successfully", 
+            totalCheckIns: allCheckIns,
+            checkIns: dataByDate,
+            monthlyStats: monthlyStats,
+            checkInsByMonth: checkInsByMonth,
+            uniqueMembersByMonth: Object.fromEntries(
+                Object.entries(uniqueMembersByMonth).map(([key, set]) => [key, set.size])
+            )
+        });
     } 
     catch (error) {
-        res.status(500).json({ success: false, message: `Internal server error ${error.message}`});
+        res.status(500).json({ 
+            success: false, 
+            message: `Internal server error: ${error.message}`,
+            error: process.env.NODE_ENV === 'development' ? error.stack : undefined
+        });
     }
 };
-
 // search for checked in attendee
 export const searchCheckedInAttendee = async (req, res) => {
     const query = req.query.q || "";
