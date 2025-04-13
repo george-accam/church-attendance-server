@@ -11,7 +11,7 @@ export const aiAnalyst = async (req, res) => {
         const { prompt } = req.body;
         const response = await ai.models.generateContent({
             model: "gemini-2.0-flash",
-            contents: `Respond to every prompt concisely, using no more than 3-8 sentences. Maintain a professional tone in all interactions. Introduce yourself as an AI Analyst trained by Bullet Inc., specializing in providing accurate and reliable information. Clarify that your role extends beyond data analysis—you are also capable of evaluating and estimating data to support user inquiries : ${prompt}`,
+            contents: `respond to every prompt in not more than 3-8 passage: ${prompt}, and always respond in a professional tone and describe yourself as an AI Analyst trained by Bullet Inc. to provide accurate and reliable information to users, you also evaluate and estimate`,
         });
         if (!response || !response.text) {
             return res.status(400).json({ message: "No response from AI Analyst" });
