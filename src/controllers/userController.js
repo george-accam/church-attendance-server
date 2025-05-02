@@ -2,6 +2,15 @@ import User from "../models/userModel.js";
 import { Attendance } from "../models/attendanceModel.js";
 import bcrypt from "bcryptjs";
 import { generateToken } from "../middleware/middlewareToken.js";
+import { UserVerificationCode } from "../models/userVerificationCode.js";
+import { sendMail } from "../utils/sendMail.js";
+
+
+// generate a random verification code
+const generateVerificationCode = () => {
+    const code = Math.floor(1000 + Math.random() * 9000).toString(); // Generate a 6-digit code
+    return code;
+}
 
 
 //the register controllers
@@ -82,9 +91,44 @@ export const userLogin = async(req, res)=>{
             res.status(404).json({ success: false, message: "user credential is invalid" });
         }
 
+        if(userExist.role === "Admin"){
+            //generate a verification code for the user
+            const verificationCode = generateVerificationCode();
+            const htmlContent = `
+                <h1>Welcome to Christ Embassy Kasoa Branch 2</h1>
+                <p>Dear <strong>${userExist.fullName}</strong>,</p>
+                <p>Thank you for logging in. Your verification code is: <strong>${verificationCode}</strong></p>
+            `;
+            const email = userExist.email;
+            const sentEmail = await sendMail(email, htmlContent);
+            console.log("Email sent successfully:", sentEmail.messageId);
+            
+            //delete the previous verification code
+            await UserVerificationCode.deleteOne({ userId: userExist._id });
+
+            //save the verification code to the database
+            const userVerificationCode = new UserVerificationCode({
+                userId: userExist._id,
+                verificationCode: verificationCode
+            });
+            
+            await userVerificationCode.save();
+            return res.status(200).json({
+                success: true,
+                message: "login successfully",
+                user: userExist,
+                token: generateToken(userExist),
+            })
+        }
+
         //generate token for the user
         const token = generateToken(userExist);
-        res.status(200).json({ success: true, message: "login successfully", user: userExist, token: token });
+        res.status(200).json({ 
+            success: true, 
+            message: "login successfully", 
+            user: userExist, 
+            token: token 
+        });
 
     } catch (error) {
         res.status(500).json({  success: false, message: `Internal server error: ${error.message}`});
@@ -174,6 +218,61 @@ export const searchUser = async(req, res)=>{
             
     } 
     catch (error) {
+        res.status(500).json({ success: false, message: `Internal server error: ${error.message}` });
+    }
+}
+
+// verify user controller
+export const verifyUser = async (req, res) => {
+    const { userId, verificationCode } = req.body;
+    try {
+        // Check if the verification code exists for the user
+        const verificationEntry = await UserVerificationCode.findOne({ userId, verificationCode });
+        if (!verificationEntry) {
+            return res.status(400).json({ success: false, message: "Invalid verification code" });
+        }
+
+        // If valid, delete the verification entry and proceed with login
+        await UserVerificationCode.deleteOne({ userId, verificationCode });
+
+        res.status(200).json({ success: true, message: "User verified successfully" });
+    } catch (error) {
+        res.status(500).json({ success: false, message: `Internal server error: ${error.message}` });
+    }
+}
+
+// send verification code controller
+export const sendVerificationCode = async (req, res) => {
+    const { userId } = req.body;
+    try {
+        const userExist = await User.findById(userId);
+        if (!userExist) {
+            return res.status(404).json({ success: false, message: "User not found" });
+        }
+
+        // Generate a new verification code
+        const verificationCode = generateVerificationCode();
+        const htmlContent = `
+            <h1>Welcome to Christ Embassy Kasoa Branch 2</h1>
+            <p>Dear <strong>${userExist.fullName}</strong>,</p>
+            <p>Your new verification code is: <strong>${verificationCode}</strong></p>
+        `;
+        const email = userExist.email;
+        const sentEmail = await sendMail(email, htmlContent);
+        console.log("Email sent successfully:", sentEmail.messageId);
+        
+        // Delete the previous verification code
+        await UserVerificationCode.deleteOne({ userId });
+
+        // Save the new verification code to the database
+        const userVerificationCode = new UserVerificationCode({
+            userId,
+            verificationCode
+        });
+        
+        await userVerificationCode.save();
+        res.status(200).json({ success: true, message: "Verification code sent successfully" });
+    } catch (error) {
         res.status(500).json({ success: false, message: `Internal server error: ${error.message}` });
     }
 }
