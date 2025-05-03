@@ -98,6 +98,7 @@ export const userLogin = async(req, res)=>{
                 <h1>Welcome to Christ Embassy Kasoa Branch 2</h1>
                 <p>Dear <strong>${userExist.fullName}</strong>,</p>
                 <p>Thank you for logging in. Your verification code is: <strong>${verificationCode}</strong></p>
+                <p>This code will expire after <strong>10 minutes</strong></p>
             `;
             const email = userExist.email;
             const sentEmail = await sendMail(email, htmlContent);
@@ -256,6 +257,7 @@ export const sendVerificationCode = async (req, res) => {
             <h1>Welcome to Christ Embassy Kasoa Branch 2</h1>
             <p>Dear <strong>${userExist.fullName}</strong>,</p>
             <p>Your new verification code is: <strong>${verificationCode}</strong></p>
+            <p>This code will expire after <strong>10 minutes</strong></p>
         `;
         const email = userExist.email;
         const sentEmail = await sendMail(email, htmlContent);
