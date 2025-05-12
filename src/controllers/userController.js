@@ -101,7 +101,8 @@ export const userLogin = async(req, res)=>{
                 <p>This code will expire after <strong>10 minutes</strong></p>
             `;
             const email = userExist.email;
-            const sentEmail = await sendMail(email, htmlContent);
+            const subject = "Your Verification Code for Christ Embassy Kasoa Branch 2";
+            const sentEmail = await sendMail(email, subject, htmlContent);
             console.log("Email sent successfully:", sentEmail.messageId);
             
             //delete the previous verification code
@@ -110,10 +111,12 @@ export const userLogin = async(req, res)=>{
             //save the verification code to the database
             const userVerificationCode = new UserVerificationCode({
                 userId: userExist._id,
-                verificationCode: verificationCode
+                verificationCode: verificationCode,
+                email: userExist.email,
             });
             
             await userVerificationCode.save();
+
             return res.status(200).json({
                 success: true,
                 message: "login successfully",
@@ -233,8 +236,142 @@ export const verifyUser = async (req, res) => {
             return res.status(400).json({ success: false, message: "Invalid verification code" });
         }
 
+        if (verificationEntry) {
+            const htmlContent = `
+                <!DOCTYPE html>
+                <html lang="en">
+                <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <title>Admin Account Notification</title>
+                    <style>
+                        body {
+                            font-family: 'Roboto', Arial, sans-serif;
+                            line-height: 1.6;
+                            color: #202124;
+                            max-width: 600px;
+                            margin: 50px auto;
+                            padding: 20px;
+                            background-color: #f5f5f5;
+                        }
+                        
+                        .container {
+                            background-color: white;
+                            border-radius: 8px;
+                            padding: 30px;
+                            border: 3px solid #dadce0;
+                            box-shadow: 0 1px 3px rgba(0,0,0,0.12);
+                        }
+                        
+                        .logo {
+                            text-align: center;
+                            margin-bottom: 20px;
+                        }
+                        
+                        .logo img {
+                            width: 100px;
+                            height: auto;
+                        }
+                        
+                        h1 {
+                            font-size: 20px;
+                            font-weight: 500;
+                            margin-bottom: 25px;
+                            color: #202124;
+                        }
+                        
+                        .highlight {
+                            font-weight: 500;
+                            color: #202124;
+                        }
+                        
+                        .email {
+                            font-weight: 500;
+                            color: #1a73e8;
+                            margin: 15px 0;
+                        }
+                        
+                        .message {
+                            margin-bottom: 25px;
+                        }
+                        
+                        .action-link {
+                            margin: 25px 0;
+                        }
+                        
+                        .action-link a {
+                            color: #1a73e8;
+                            text-decoration: none;
+                            font-weight: 500;
+                        }
+                        .logo h1 {
+                            font-family: Georgia, 'Times New Roman', Times, serif;
+                            font-size: 28px;
+                            font-weight: 700;
+                            color: #670764;
+                            color: -webkit-linear-gradient(79deg, #670764 0%, #f20020 50%, #d55200 100%);
+                            color: linear-gradient(79deg, #670764 0%, #f20020 50%, #d55200 100%);
+                            margin-bottom: 10px;
+                        }
+                        .action-link a:hover {
+                            text-decoration: underline;
+                        }
+                        
+                        .footer {
+                            margin-top: 30px;
+                            font-size: 12px;
+                            color: #5f6368;
+                            text-align: center;
+                            border-top: 1px solid #dadce0;
+                            padding-top: 20px;
+                        }
+                        
+                        .device-info {
+                            background-color: #f8f9fa;
+                            padding: 15px;
+                            border-radius: 6px;
+                            margin: 20px 0;
+                        }
+                        
+                        .device-info p {
+                            margin: 5px 0;
+                        }
+                    </style>
+                </head>
+                <body>
+                    <div class="container">
+                        <div class="logo">
+                            <h1>BULLET TECH</h1>
+                        </div>
+                        
+                        <h1>A new log-in on <span style="color: #1a73e8; text-decoration: underline;">https://cek2attendancesystem.vercel.app/</span></h1>
+                        
+                        <div class="email">📨 ${verificationEntry.email}</div>
+                        
+                        <div class="message">
+                            <p>We noticed a new log-in to your Christ Embassy KB-2 System. If this was you, you don't need to do anything. If not, we'll help you secure your system.</p>
+                        </div>
+                        
+                        <div class="device-info">
+                            <p><strong>Date:</strong> ${new Date().toLocaleDateString("en-GB")} </p>
+                            <p><strong>Time:</strong> ${new Date().toLocaleTimeString()} </p>
+                        </div>
+                        
+                        <div class="footer">
+                            <p>You received this email to let you know about important changes to the System.</p>
+                            <p>© 2025 Bullet Technology, Ghana</p>
+                        </div>
+                    </div>
+                </body>
+                </html>
+            `;
+            const email = verificationEntry.email;
+            const subject = "New Log-in on Christ Embassy KB-2 System";
+            sendMail(email, subject, htmlContent);
+        }
         // If valid, delete the verification entry and proceed with login
         await UserVerificationCode.deleteOne({ userId, verificationCode });
+
 
         res.status(200).json({ success: true, message: "User verified successfully" });
     } catch (error) {

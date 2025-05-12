@@ -10,12 +10,12 @@ const transporter = nodemailer.createTransport({
     },
 });
 
-export const sendMail = async (email, htmlContent) => {
+export const sendMail = async (email, subject, htmlContent) => {
     try {
         const info = await transporter.sendMail({
-            from: `"Christ Embassy kasoa Branch 2 👻" <${process.env.EMAIL_ADDRESS}>`, // sender address
+            from: `"Christ Embassy kasoa Branch 2 💖" <${process.env.EMAIL_ADDRESS}>`, // sender address
             to: email, // list of receivers
-            subject: "Your Verification Code", // Subject line
+            subject: subject, // Subject line
             html: htmlContent, // html body
         });
     
