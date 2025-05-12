@@ -2,7 +2,7 @@ import { Attendance, AttendeesCheck, PersonalAttendance } from "../models/attend
 
 //register attendance
 export const createAttendance = async (req, res) => {
-    const { userId, userFullName, fullName, phoneNumber } = req.body;
+    const { userId, userFullName, fullName, phoneNumber, checkedBy } = req.body;
     try {
         //check if attendee already exist
         const attendeeExist = await Attendance.findOne({ phoneNumber });
@@ -32,7 +32,8 @@ export const createAttendance = async (req, res) => {
         const checkIn = new AttendeesCheck({ 
             userId: savedAttendance._id,
             attendeeFullName: savedAttendance.fullName,
-            attendeePhoneNumber: savedAttendance.phoneNumber 
+            attendeePhoneNumber: savedAttendance.phoneNumber,
+            checkedBy: savedAttendance.userFullName, 
         });
         // save check in
         const newCheckIn = await checkIn.save();
@@ -172,7 +173,7 @@ export const deletePersonalAttendance = async (req, res) =>{
 
 //check in attendee
 export const checkInAttendee = async (req, res) => {
-    const { phoneNumber } = req.body;
+    const { phoneNumber, checkedBy } = req.body;
     try {
         //check if attendee exist
         const attendeeExist = await Attendance.findOne({ phoneNumber });
@@ -193,7 +194,8 @@ export const checkInAttendee = async (req, res) => {
         const newCheckIn = new AttendeesCheck({ 
             userId: attendeeExist._id,
             attendeeFullName: attendeeExist.fullName,
-            attendeePhoneNumber: attendeeExist.phoneNumber
+            attendeePhoneNumber: attendeeExist.phoneNumber,
+            checkedBy: checkedBy,
         });
         if (!newCheckIn) {
             return res.status(404).json({ message: "All fields are required" });
