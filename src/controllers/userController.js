@@ -236,6 +236,12 @@ export const verifyUser = async (req, res) => {
             return res.status(400).json({ success: false, message: "Invalid verification code" });
         }
 
+        const options = {
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: true
+        };
+
         if (verificationEntry) {
             const htmlContent = `
                 <!DOCTYPE html>
@@ -354,7 +360,7 @@ export const verifyUser = async (req, res) => {
                         
                         <div class="device-info">
                             <p><strong>Date:</strong> ${new Date().toLocaleDateString("en-GB")} </p>
-                            <p><strong>Time:</strong> ${new Date().toLocaleTimeString()} </p>
+                            <p><strong>Time:</strong> ${new Date().toLocaleTimeString("en-GB", options)} </p>
                         </div>
                         
                         <div class="footer">
