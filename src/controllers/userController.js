@@ -242,6 +242,7 @@ export const verifyUser = async (req, res) => {
             hour12: true
         };
 
+        // Send an email to the user to notify them of the new login
         if (verificationEntry) {
             const htmlContent = `
                 <!DOCTYPE html>
@@ -375,6 +376,7 @@ export const verifyUser = async (req, res) => {
             const subject = "New Log-in on Christ Embassy KB-2 System";
             sendMail(email, subject, htmlContent);
         }
+
         // If valid, delete the verification entry and proceed with login
         await UserVerificationCode.deleteOne({ userId, verificationCode });
 
