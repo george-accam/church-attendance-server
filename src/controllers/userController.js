@@ -348,7 +348,7 @@ export const verifyUser = async (req, res) => {
                 <body>
                     <div class="container">
                         <div class="logo">
-                            <h1>BULLET TECH</h1>
+                            <img src="https://r4lcfqu82x.ufs.sh/f/dD4aXXWLaAu6vuEOCj2zniYFW5f3jKNy0kq9xuDEcVMROhtT" alt="logo" style="width: 100px; height: auto;">
                         </div>
                         
                         <h1>A new log-in on <span style="color: #1a73e8; text-decoration: underline;">https://cek2attendancesystem.vercel.app/</span></h1>
