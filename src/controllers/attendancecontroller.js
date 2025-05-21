@@ -5,11 +5,6 @@ import FingerPrintModel from "../models/FingerPrintModel.js";
 export const collectFingerPrint = async (req, res) => {
     const { fingerprintID } = req.body;
     try {
-        //check if fingerprint already exist
-        // const fingerprintExist = await FingerPrintModel.findOne({ fingerprintID });
-        // if (fingerprintExist) {
-        //     res.status(404).json({ message: "fingerprint already exist" });
-        // }
 
         // delete existing fingerprint
         await FingerPrintModel.deleteMany({ fingerprintID });
