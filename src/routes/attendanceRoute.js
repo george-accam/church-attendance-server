@@ -14,13 +14,18 @@ import {
     deletePersonalAttendance,
     getAllAttendeesCheckIns,
     searchCheckedInAttendee,
+    collectFingerPrint,
+    getFingerPrint,
 } from "../controllers/attendancecontroller.js";
 import { verifyToken } from "../middleware/middlewareToken.js";
 
 const router = Router();
 
+router.post("/fingerprint-id", collectFingerPrint); // collect finger print
 router.post("/attendee", createAttendance); // create attendance
 router.post("/check-in", checkInAttendee); // check in attendance
+
+router.get("/fingerprint", getFingerPrint); // get finger print
 router.get("/search-attendee", searchAttendee); // search attendee
 router.get("/search-personal-attendance/:userId", searchPersonalAttendance); // search personal attendance
 router.get("/attendees", getAttendance); // get all attendance
@@ -29,8 +34,10 @@ router.get("/attendee/:id", getAttendeeById); // get attendance by id
 router.get("/check-in/:phoneNumber", getAttendeeCheckIn); // get number of attendance by phone number
 router.get("/all-check-ins", getAllAttendeesCheckIns) // get all check ins
 router.get("/search-checked-in-attendee",searchCheckedInAttendee)
+
 router.put("/update-personal-attendee/:id", updatePersonalAttendance); // update personal attendance
 router.put("/update-attendance/:id", updateAttendance); // update attendance by id
+
 router.delete("/delete-personal-attendee/:id", deletePersonalAttendance); // delete personal attendance
 router.delete("/delete-attendance/:id", deleteAttendance); // delete attendance by id
 

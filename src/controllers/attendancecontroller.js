@@ -1,8 +1,56 @@
 import { Attendance, AttendeesCheck, PersonalAttendance } from "../models/attendanceModel.js";
+import FingerPrintModel from "../models/FingerPrintModel.js";
+
+// collect fingerprint
+export const collectFingerPrint = async (req, res) => {
+    const { fingerprintID } = req.body;
+    try {
+        //check if fingerprint already exist
+        // const fingerprintExist = await FingerPrintModel.findOne({ fingerprintID });
+        // if (fingerprintExist) {
+        //     res.status(404).json({ message: "fingerprint already exist" });
+        // }
+
+        // delete existing fingerprint
+        await FingerPrintModel.deleteMany({ fingerprintID });
+
+        //create new fingerprint
+        const newFingerPrint = new FingerPrintModel({ fingerprintID });
+        if (!newFingerPrint) {
+            return res.status(404).json({ message: "fingerprint required are required" });
+        }
+        //save fingerprint
+        const savedFingerPrint = await newFingerPrint.save();
+        res.status(201).json({ 
+            success: true, 
+            message: "fingerprint registered successfully", 
+            fingerprint: savedFingerPrint 
+        });
+
+    } catch (error) {
+        res.status(500).json({ message: `Internal server error: ${error.message}` });
+    }
+}
+
+export const getFingerPrint = async (req, res) => {
+    try {
+        const fingerprint = await FingerPrintModel.find().select("-__v").sort({ createdAt: -1 });
+        if (!fingerprint) {
+            return res.status(404).json({ message: "No fingerprint found" });
+        }
+        res.status(200).json({
+            success: true,
+            message: "fingerprint retrieved successfully",
+            fingerprint: fingerprint 
+        });
+    } catch (error) {
+        res.status(500).json({ message: `Internal server error: ${error.message}` });
+    }
+}
 
 //register attendance
 export const createAttendance = async (req, res) => {
-    const { userId, userFullName, fullName, phoneNumber, checkedBy } = req.body;
+    const { userId, userFullName, fullName, phoneNumber } = req.body;
     try {
         //check if attendee already exist
         const attendeeExist = await Attendance.findOne({ phoneNumber });
@@ -307,6 +355,7 @@ export const getAllAttendeesCheckIns = async (req, res) => {
         });
     }
 };
+
 // search for checked in attendee
 export const searchCheckedInAttendee = async (req, res) => {
     const query = req.query.q || "";
@@ -344,7 +393,6 @@ export const searchCheckedInAttendee = async (req, res) => {
         res.status(500).json({ success: false, message: `Internal server error ${error.message}` });
     }
 };
-
 
 //get number of attendance by phone number
 export const getAttendeeCheckIn = async (req, res) => {
