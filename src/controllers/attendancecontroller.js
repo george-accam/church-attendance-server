@@ -1,6 +1,8 @@
 import { Attendance, AttendeesCheck, PersonalAttendance } from "../models/attendanceModel.js";
 import FingerPrintModel from "../models/FingerPrintModel.js";
 
+import { getSocket } from "../socketServer/Socket.js";
+
 // collect fingerprint
 export const collectFingerPrint = async (req, res) => {
     const { fingerprintID } = req.body;
@@ -16,6 +18,12 @@ export const collectFingerPrint = async (req, res) => {
         }
         //save fingerprint
         const savedFingerPrint = await newFingerPrint.save();
+
+        // Emit the fingerprint to all connected clients
+        const io = getSocket();
+        io.emit("message", {
+            fingerprintID: savedFingerPrint.fingerprintID
+        });
         res.status(201).json({ 
             success: true, 
             message: "fingerprint registered successfully", 

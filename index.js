@@ -1,6 +1,8 @@
 import express from 'express';
 import dotenv from 'dotenv';
 import cors from 'cors';
+import http from 'http';
+import { Server } from 'socket.io';
 import { DBConfiguration } from './src/DBconfig/BDConfiguration.js';
 import userRouter  from './src/routes/userRoute.js';
 import attendanceRouter from './src/routes/attendanceRoute.js';
@@ -8,15 +10,23 @@ import titheAndWelfareRouter from './src/routes/titheAndWelfareRoute.js';
 import aiAnalystRouter from './src/routes/aiAnalystRouter.js';
 
 dotenv.config();
-
-const app = express();
-const PORT = process.env.PORT || 3000;
-
 // Database Configuration
 DBConfiguration();
 
+// Create an HTTP server
+const PORT = process.env.PORT || 3000;
+const app = express();
+const server = http.createServer(app);
+
+// Create a Socket.IO server
+import { initSocket } from './src/socketServer/Socket.js';
+initSocket(server);
+
+
+
 // CORS Middleware
 app.use(cors());
+
 // Body Parser Middleware
 app.use(express.json());
 
@@ -36,8 +46,8 @@ app.get("/", (req, res) => {
 });
 
 
-app.listen(PORT, "0.0.0.0", () => {
-    console.log(`Server is running on http://172.28.224.1:${PORT}`);
+server.listen(PORT, "0.0.0.0", () => {
+    console.log(`Server is running on http://localhost:${PORT}`);
 });
 
 export default app;
